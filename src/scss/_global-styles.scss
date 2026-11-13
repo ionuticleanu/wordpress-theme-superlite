@@ -71,10 +71,18 @@ body {
 	align-items: center;
 	gap: var(--wp--style--block-gap);
 }
+:where(.is-layout-flex).is-nowrap { flex-wrap: nowrap; }
+:where(.is-layout-flex).is-vertical { flex-direction: column; align-items: stretch; }
+:where(.is-layout-flex).is-content-justification-left { justify-content: flex-start; }
+:where(.is-layout-flex).is-content-justification-center { justify-content: center; }
+:where(.is-layout-flex).is-content-justification-right { justify-content: flex-end; }
+:where(.is-layout-flex).is-content-justification-space-between { justify-content: space-between; }
 :where(.is-layout-grid) {
 	display: grid;
 	gap: var(--wp--style--block-gap);
 }
+/*! purgecss ignore */
+img:is([sizes="auto" i],[sizes^="auto," i]) { contain-intrinsic-size: 3000px 1500px; }
 .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }
 .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }
 .aligncenter { clear: both; margin-inline-start: auto; margin-inline-end: auto; }

@@ -12,8 +12,8 @@ $site_name      = get_bloginfo('name');
 $author_name    = wp_get_theme()->get('Author');
 $author_url     = wp_get_theme()->get('AuthorURI');
 ?>
-<!-- wp:group {"tagName":"footer","layout":{"type":"constrained"}} -->
-<footer class="wp-block-group">
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group">
 	<!-- wp:group {"layout":{"type":"flex","justifyContent":"space-between","flexWrap":"wrap"}} -->
 	<div class="wp-block-group">
 		<!-- wp:paragraph {"fontSize":"sm"} -->
@@ -42,5 +42,5 @@ $author_url     = wp_get_theme()->get('AuthorURI');
 		<?php endif; ?>
 	</div>
 	<!-- /wp:group -->
-</footer>
+</div>
 <!-- /wp:group -->

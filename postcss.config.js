@@ -24,6 +24,7 @@ module.exports = {
 							standard: [
 								'html',
 								'body',
+								'img',
 								'alignwide',
 								'alignfull',
 								'alignleft',
@@ -36,6 +37,9 @@ module.exports = {
 							],
 							deep: [
 								/^is-layout-/,
+								/^is-content-justification-/,
+								/^is-nowrap/,
+								/^is-vertical/,
 								/^is-menu-/,
 								/^has-child/,
 								/^open-on-/,

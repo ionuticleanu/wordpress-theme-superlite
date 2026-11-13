@@ -21,9 +21,9 @@ add_action('wp_enqueue_scripts', function () {
 	$theme_uri = get_template_directory_uri();
 
 	$css_file = $theme_dir . '/dist/css/main.css';
-	if (file_exists($css_file)) {
+	if (file_exists($css_file) && filesize($css_file) > 0) {
 		wp_enqueue_style(
-			'mytheme-main',
+			'superlite-main',
 			$theme_uri . '/dist/css/main.css',
 			[],
 			filemtime($css_file)
@@ -32,13 +32,13 @@ add_action('wp_enqueue_scripts', function () {
 
 	$js_file  = $theme_dir . '/dist/js/main.js';
 	$js_asset = $theme_dir . '/dist/js/main.asset.php';
-	if (file_exists($js_file)) {
+	if (file_exists($js_file) && filesize($js_file) > 0) {
 		$asset = file_exists($js_asset)
 			? require $js_asset
 			: ['dependencies' => [], 'version' => filemtime($js_file)];
 
 		wp_enqueue_script(
-			'mytheme-main',
+			'superlite-main',
 			$theme_uri . '/dist/js/main.js',
 			$asset['dependencies'],
 			$asset['version'],
