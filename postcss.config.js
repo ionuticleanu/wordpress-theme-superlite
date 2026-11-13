@@ -12,6 +12,7 @@ module.exports = {
 							'./templates/**/*.html',
 							'./parts/**/*.html',
 							'./patterns/**/*.php',
+							'./pages/**/*.php',
 							'./menus/**/*.html',
 							'./inc/**/*.php',
 							'./functions.php',

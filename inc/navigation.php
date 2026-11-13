@@ -1,6 +1,26 @@
 <?php
 
 /**
+ * Resolve root-relative `url` attributes inside parsed navigation inner blocks
+ * against `home_url()` so file-based menus work in subdirectory installs.
+ *
+ * @param array $blocks Parsed block arrays.
+ * @return array
+ */
+function superlite_resolve_menu_urls($blocks) {
+	foreach ($blocks as &$block) {
+		$url = $block['attrs']['url'] ?? '';
+		if (is_string($url) && strpos($url, '/') === 0 && strpos($url, '//') !== 0) {
+			$block['attrs']['url'] = home_url($url);
+		}
+		if (!empty($block['innerBlocks'])) {
+			$block['innerBlocks'] = superlite_resolve_menu_urls($block['innerBlocks']);
+		}
+	}
+	return $blocks;
+}
+
+/**
  * Resolve `menuSlug` on `core/navigation` blocks to a `wp_navigation` post ID,
  * or fall back to a theme-file menu definition in `menus/<slug>.html`.
  *
@@ -33,7 +53,7 @@ function superlite_resolve_navigation_slug($parsed_block) {
 		if ($contents !== false) {
 			$parsed = parse_blocks("<!-- wp:navigation -->\n" . $contents . "\n<!-- /wp:navigation -->");
 			if (!empty($parsed[0]['innerBlocks'])) {
-				$parsed_block['innerBlocks']  = $parsed[0]['innerBlocks'];
+				$parsed_block['innerBlocks']  = superlite_resolve_menu_urls($parsed[0]['innerBlocks']);
 				$parsed_block['innerContent'] = $parsed[0]['innerContent'];
 			}
 		}

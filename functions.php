@@ -2,6 +2,7 @@
 
 require_once get_template_directory() . '/inc/cleanup.php';
 require_once get_template_directory() . '/inc/navigation.php';
+require_once get_template_directory() . '/inc/pages.php';
 
 // Auto-register all compiled blocks in dist/blocks/
 add_action('init', function () {
