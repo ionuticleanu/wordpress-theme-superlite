@@ -12,10 +12,23 @@ $site_name      = get_bloginfo('name');
 $author_name    = wp_get_theme()->get('Author');
 $author_url     = wp_get_theme()->get('AuthorURI');
 ?>
-<!-- wp:group {"layout":{"type":"constrained"}} -->
-<div class="wp-block-group">
-	<!-- wp:group {"layout":{"type":"flex","justifyContent":"space-between","flexWrap":"wrap"}} -->
-	<div class="wp-block-group">
+<!-- wp:group {"className":"site-footer","layout":{"type":"constrained"}} -->
+<div class="wp-block-group site-footer">
+	<!-- wp:group {"align":"wide","className":"site-footer__main","layout":{"type":"flex","justifyContent":"space-between","flexWrap":"wrap"}} -->
+	<div class="wp-block-group alignwide site-footer__main">
+		<!-- wp:group {"className":"site-footer__brand","layout":{"type":"flex","orientation":"vertical"}} -->
+		<div class="wp-block-group site-footer__brand">
+			<!-- wp:site-title {"level":0} /-->
+			<!-- wp:site-tagline /-->
+		</div>
+		<!-- /wp:group -->
+
+		<!-- wp:navigation {"menuSlug":"footer","overlayMenu":"never","className":"site-footer__nav","layout":{"type":"flex","flexWrap":"wrap"}} /-->
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"align":"wide","className":"site-footer__bottom","layout":{"type":"flex","justifyContent":"space-between","flexWrap":"wrap"}} -->
+	<div class="wp-block-group alignwide site-footer__bottom">
 		<!-- wp:paragraph {"fontSize":"sm"} -->
 		<p class="has-sm-font-size">&copy; <?php echo esc_html($copyright_year); ?> <?php echo esc_html($site_name); ?></p>
 		<!-- /wp:paragraph -->

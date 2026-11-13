@@ -22,6 +22,29 @@ function toRem(value) {
 }
 
 /**
+ * Resolve WordPress theme.json `var:preset|<type>|<slug>` and `var:custom|<path>` syntax
+ * into standard CSS `var(--wp--...)` references.
+ */
+function resolvePresetValue(value) {
+	if (typeof value !== 'string') {
+		return value;
+	}
+	if (value.startsWith('var:preset|')) {
+		const [, type, slug] = value.split('|');
+		if (type && slug) {
+			return `var(--wp--preset--${type}--${slug})`;
+		}
+	}
+	if (value.startsWith('var:custom|')) {
+		const parts = value.slice('var:custom|'.length).split('|');
+		if (parts.length) {
+			return `var(--wp--custom--${parts.join('--')})`;
+		}
+	}
+	return value;
+}
+
+/**
  * Compute a WordPress-style fluid clamp() value for a fontSize entry.
  */
 function resolveFontSize(entry) {
@@ -53,10 +76,10 @@ function styleObjectToDeclarations(style = {}) {
 
 	if (style.color) {
 		if (style.color.background) {
-			decls.push(`background-color: ${style.color.background};`);
+			decls.push(`background-color: ${resolvePresetValue(style.color.background)};`);
 		}
 		if (style.color.text) {
-			decls.push(`color: ${style.color.text};`);
+			decls.push(`color: ${resolvePresetValue(style.color.text)};`);
 		}
 	}
 
@@ -73,34 +96,48 @@ function styleObjectToDeclarations(style = {}) {
 		};
 		for (const [key, prop] of Object.entries(map)) {
 			if (style.typography[key] !== undefined) {
-				decls.push(`${prop}: ${style.typography[key]};`);
+				decls.push(`${prop}: ${resolvePresetValue(style.typography[key])};`);
 			}
 		}
 	}
 
 	if (style.border) {
 		if (style.border.radius) {
-			decls.push(`border-radius: ${style.border.radius};`);
+			decls.push(`border-radius: ${resolvePresetValue(style.border.radius)};`);
 		}
 		if (style.border.color) {
-			decls.push(`border-color: ${style.border.color};`);
+			decls.push(`border-color: ${resolvePresetValue(style.border.color)};`);
 		}
 		if (style.border.width) {
-			decls.push(`border-width: ${style.border.width};`);
+			decls.push(`border-width: ${resolvePresetValue(style.border.width)};`);
 		}
 		if (style.border.style) {
 			decls.push(`border-style: ${style.border.style};`);
+		}
+		for (const side of ['top', 'right', 'bottom', 'left']) {
+			const sideBorder = style.border[side];
+			if (sideBorder && typeof sideBorder === 'object') {
+				if (sideBorder.color) {
+					decls.push(`border-${side}-color: ${resolvePresetValue(sideBorder.color)};`);
+				}
+				if (sideBorder.width) {
+					decls.push(`border-${side}-width: ${resolvePresetValue(sideBorder.width)};`);
+				}
+				if (sideBorder.style) {
+					decls.push(`border-${side}-style: ${sideBorder.style};`);
+				}
+			}
 		}
 	}
 
 	if (style.spacing && style.spacing.padding) {
 		const p = style.spacing.padding;
 		if (typeof p === 'string') {
-			decls.push(`padding: ${p};`);
+			decls.push(`padding: ${resolvePresetValue(p)};`);
 		} else {
 			for (const side of ['top', 'right', 'bottom', 'left']) {
 				if (p[side] !== undefined) {
-					decls.push(`padding-${side}: ${p[side]};`);
+					decls.push(`padding-${side}: ${resolvePresetValue(p[side])};`);
 				}
 			}
 		}
@@ -109,11 +146,11 @@ function styleObjectToDeclarations(style = {}) {
 	if (style.spacing && style.spacing.margin) {
 		const m = style.spacing.margin;
 		if (typeof m === 'string') {
-			decls.push(`margin: ${m};`);
+			decls.push(`margin: ${resolvePresetValue(m)};`);
 		} else {
 			for (const side of ['top', 'right', 'bottom', 'left']) {
 				if (m[side] !== undefined) {
-					decls.push(`margin-${side}: ${m[side]};`);
+					decls.push(`margin-${side}: ${resolvePresetValue(m[side])};`);
 				}
 			}
 		}
@@ -127,6 +164,44 @@ function formatRule(selector, decls) {
 		return '';
 	}
 	return `${selector} {\n\t${decls.join('\n\t')}\n}\n`;
+}
+
+function blockNameToSelector(blockName) {
+	const specialSelectors = {
+		'core/paragraph': ':where(p)',
+		'core/heading': ':where(h1, h2, h3, h4, h5, h6)',
+		'core/list': ':where(ul, ol)',
+	};
+	if (specialSelectors[blockName]) {
+		return specialSelectors[blockName];
+	}
+	const [namespace, name] = blockName.split('/');
+	if (!name) {
+		return `:where(.wp-block-${namespace})`;
+	}
+	if (namespace === 'core') {
+		return `:where(.wp-block-${name})`;
+	}
+	return `:where(.wp-block-${namespace}-${name})`;
+}
+
+function appendElementRules(target, elementsConfig, baseSelectors) {
+	for (const [element, config] of Object.entries(elementsConfig || {})) {
+		const selector = baseSelectors[element];
+		if (!selector) {
+			continue;
+		}
+		target.push(formatRule(selector, styleObjectToDeclarations(config)));
+		if (config[':hover']) {
+			const hoverSelector = selector.replace(/:where\((.+)\)/, (_, inner) =>
+				`:where(${inner
+					.split(',')
+					.map((s) => `${s.trim()}:hover`)
+					.join(', ')})`
+			);
+			target.push(formatRule(hoverSelector, styleObjectToDeclarations(config[':hover'])));
+		}
+	}
 }
 
 function generateThemeCss() {
@@ -150,13 +225,13 @@ function generateThemeCss() {
 
 	// Block gap & root padding variables
 	if (styles.spacing && styles.spacing.blockGap) {
-		rootVars.push(`--wp--style--block-gap: ${styles.spacing.blockGap};`);
+		rootVars.push(`--wp--style--block-gap: ${resolvePresetValue(styles.spacing.blockGap)};`);
 	}
 	const useRootPadding = Boolean(settings.useRootPaddingAwareAlignments);
 	if (useRootPadding && styles.spacing && styles.spacing.padding) {
 		for (const side of ['top', 'right', 'bottom', 'left']) {
 			const val = styles.spacing.padding[side] || '0px';
-			rootVars.push(`--wp--style--root--padding-${side}: ${val};`);
+			rootVars.push(`--wp--style--root--padding-${side}: ${resolvePresetValue(val)};`);
 		}
 	}
 
@@ -193,7 +268,9 @@ function generateThemeCss() {
 
 	const sections = [
 		'/* Auto-generated from theme.json by scripts/generate-theme-css.js. Do not edit directly. */',
+		'/*! purgecss start ignore */',
 		formatRule(':root', rootVars),
+		'*, ::before, ::after {\n\tbox-sizing: border-box;\n}\n',
 	];
 
 	// Body styles (omit padding on body when useRootPaddingAwareAlignments is enabled)
@@ -277,26 +354,42 @@ function generateThemeCss() {
 		h6: ':where(h6)',
 	};
 
-	for (const [element, config] of Object.entries(styles.elements || {})) {
-		const selector = elementSelectors[element];
-		if (!selector) {
+	appendElementRules(sections, styles.elements, elementSelectors);
+
+	// Per-block styles from theme.json
+	for (const [blockName, blockConfig] of Object.entries(styles.blocks || {})) {
+		if (!blockConfig || typeof blockConfig !== 'object') {
 			continue;
 		}
-		sections.push(formatRule(selector, styleObjectToDeclarations(config)));
-		if (config[':hover']) {
-			const hoverSelector = selector.replace(/:where\((.+)\)/, (_, inner) =>
-				`:where(${inner
-					.split(',')
-					.map((s) => `${s.trim()}:hover`)
-					.join(', ')})`
-			);
-			sections.push(formatRule(hoverSelector, styleObjectToDeclarations(config[':hover'])));
+		const selector = blockNameToSelector(blockName);
+		const decls = styleObjectToDeclarations(blockConfig);
+		if (blockConfig.spacing?.blockGap !== undefined) {
+			decls.push(`--wp--style--block-gap: ${resolvePresetValue(blockConfig.spacing.blockGap)};`);
+		}
+		sections.push(formatRule(selector, decls));
+
+		if (blockConfig.elements) {
+			const innerBase = selector.replace(/^:where\((.+)\)$/, '$1');
+			const blockElementSelectors = {
+				link: `:where(${innerBase} a)`,
+				button: `:where(${innerBase} .wp-element-button, ${innerBase} .wp-block-button__link)`,
+				heading: `:where(${innerBase} h1, ${innerBase} h2, ${innerBase} h3, ${innerBase} h4, ${innerBase} h5, ${innerBase} h6)`,
+				h1: `:where(${innerBase} h1)`,
+				h2: `:where(${innerBase} h2)`,
+				h3: `:where(${innerBase} h3)`,
+				h4: `:where(${innerBase} h4)`,
+				h5: `:where(${innerBase} h5)`,
+				h6: `:where(${innerBase} h6)`,
+			};
+			appendElementRules(sections, blockConfig.elements, blockElementSelectors);
 		}
 	}
 
 	if (utilityRules.length) {
-		sections.push(utilityRules.join('\n') + '\n');
+		sections.push(utilityRules.join('\n'));
 	}
+
+	sections.push('/*! purgecss end ignore */\n');
 
 	const output = sections.filter(Boolean).join('\n');
 	fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
