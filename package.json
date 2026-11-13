@@ -4,12 +4,17 @@
 	"private": true,
 	"description": "Minimizing assets",
 	"scripts": {
-		"dev": "wp-scripts start --webpack-src-dir=src --output-path=dist --experimental-modules",
-		"build": "wp-scripts build --webpack-src-dir=src --output-path=dist --experimental-modules",
+		"dev": "wp-scripts start --source-path=src --output-path=dist --experimental-modules",
+		"build": "wp-scripts build --source-path=src --output-path=dist --experimental-modules",
+		"sync:theme-css": "node scripts/generate-theme-css.js",
 		"format": "wp-scripts format"
 	},
 	"devDependencies": {
+		"@fullhuman/postcss-purgecss": "^9.1.0",
+		"@tailwindcss/postcss": "^4.3.5",
+		"@wordpress/block-library": "^12.1.0",
 		"@wordpress/interactivity": "^8.1.0",
-		"@wordpress/scripts": "^37.1.0"
+		"@wordpress/scripts": "^35.0.0",
+		"tailwindcss": "^4.3.5"
 	}
 }

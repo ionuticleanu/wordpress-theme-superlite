@@ -1,23 +1,24 @@
 # AGENTS.md
 
 ## Project Overview
-This repository is a custom **WordPress 7+ Block Theme** built from scratch. It uses Full Site Editing (FSE) templates, `theme.json` design tokens, and **Webpack** to bundle and minify CSS/SCSS, JavaScript, and custom Gutenberg blocks.
+This repository is a custom **WordPress 7+ Block Theme** built from scratch. It uses Full Site Editing (FSE) templates, `theme.json` design tokens and block settings, and **Webpack** to bundle and minify CSS/SCSS, JavaScript, and custom Gutenberg blocks.
 
 **Guiding Philosophy (Pragmatic & Lenient):**
 - Prioritize clean, readable, maintainable code over rigid enterprise WordPress VIP/WPCS rules.
 - Do **not** enforce Yoda conditions (`'value' === $var`), heavy docblock boilerplate on simple helpers, or brittle static React `save()` migrations when dynamic PHP rendering works better.
 - Keep security non-negotiable (escaping, sanitization, nonces) and follow modern WordPress 7+ block standards (`apiVersion: 3`, `theme.json` v3, Interactivity API).
+- **Theme settings over database blocks:** Prioritize making all theme, layout, and block modifications via `theme.json` (`settings` and `styles`) and version-controlled theme files (`templates/`, `parts/`, `patterns/`, `menus/`, `inc/`, `functions.php`). Do **not** rely on the WordPress database's block features (`wp_block` reusable/synced blocks, `wp_global_styles`, `wp_template`, `wp_template_part`, or `wp_navigation` post overrides) to store theme configuration or design changes.
 
 ---
 
 ## Directory Structure
 Adjust paths below if your theme uses different folder names:
-- `theme.json` — **Design system & block settings (`"version": 3`)**. Single source of truth for colors, typography, spacing, layout widths, and core block defaults.
+- `theme.json` — **Primary configuration layer (`"version": 3`)**. Single source of truth for global and per-block `settings` (colors, typography, spacing, layout widths, enabled block controls) and `styles` (core and custom block defaults).
 - `style.css` — Theme header metadata required by WordPress (do not write theme styles here).
 - `functions.php` — Theme setup, block auto-registration, Block Bindings/Hooks, and global asset enqueues.
 - `templates/` — HTML block templates (`index.html`, `single.html`, `page.html`, `archive.html`, `404.html`).
 - `parts/` — HTML template parts (`header.html`, `footer.html`).
-- `patterns/` — PHP block patterns with standard WordPress file headers (use PHP for dynamic asset URLs and translatable strings).
+- `patterns/` — PHP block patterns with standard WordPress file headers (use PHP for dynamic asset URLs and translatable strings; replaces database-stored reusable blocks).
 - `inc/` — Modular PHP helpers (custom post types, Block Binding sources, Block Hooks, AJAX/REST handlers).
 - `src/` — **Webpack source files**:
   - `src/scss/` & `src/js/` — Global theme styles and scripts.
@@ -42,16 +43,17 @@ Adjust paths below if your theme uses different folder names:
 
 ## WordPress 7+ Block Standards
 
-### 1. Prefer `theme.json` & Patterns Before Custom Blocks
-Before building a custom block, check whether the requirement can be solved with less code:
-- **Design & layout:** Configure palette colors, fluid typography, spacing presets, and core block styling in `theme.json` (schema v3). Reference generated `--wp--preset--*` CSS custom properties in your SCSS instead of hardcoding values.
-- **Reusable sections:** Create a file in `patterns/` using core blocks rather than building a rigid custom block.
-- **Dynamic post meta / custom fields:** Use the **Block Bindings API** (`register_block_bindings_source()`) to bind core Paragraph, Heading, Image, or Button blocks to custom data before inventing a custom block.
+### 1. Prioritize Theme Settings (`theme.json`) Over Database Blocks & Custom Blocks
+Always solve design, behavior, and layout changes through theme settings and static theme files first:
+- **Configure via `theme.json` `settings` & `styles`:** Control color palettes, fluid typography, spacing scales, layout constraints, block feature toggles, and per-block defaults (`settings.blocks.<block-name>` and `styles.blocks.<block-name>`) directly in `theme.json` (schema v3). Reference generated `--wp--preset--*` CSS custom properties in SCSS instead of hardcoding values.
+- **Avoid database-stored block & Site Editor overrides:** Never treat database records (`wp_block` synced/reusable blocks, `wp_global_styles`, `wp_template`, `wp_template_part`, `wp_navigation`, or raw block markup in `wp_options`) as the source of truth. If adjustments are prototyped in the Site Editor, port them into `theme.json`, `templates/`, `parts/`, or `patterns/` and discard the database overrides.
+- **File-based patterns over reusable DB blocks:** Build reusable sections as PHP files in `patterns/` using core blocks rather than saving synced blocks (`wp_block`) in the database or inventing rigid custom blocks.
+- **Dynamic post meta / custom fields:** Use the **Block Bindings API** (`register_block_bindings_source()`) to bind core Paragraph, Heading, Image, or Button blocks to custom data before creating a custom block.
 
 ### 2. Custom Block Architecture
 - **Use `apiVersion: 3`:** Every `block.json` must declare `"apiVersion": 3` so the block renders cleanly inside the iframed Site Editor and Post Editor.
 - **Default to Dynamic Blocks (`render.php`):** Use `"render": "file:./render.php"` in `block.json` and return `null` from `save()` in JS. Server-side rendering avoids Gutenberg block validation errors and deprecation migrations when HTML markup evolves.
-- **Always use `get_block_wrapper_attributes()`:** In `render.php`, output wrapper attributes on the root HTML element (`<div <?php echo get_block_wrapper_attributes(); ?>>`) so WordPress automatically applies spacing, color, typography, and alignment supports.
+- **Always use `get_block_wrapper_attributes()`:** In `render.php`, output wrapper attributes on the root HTML element (`<div <?php echo get_block_wrapper_attributes(); ?>>`) so WordPress automatically applies spacing, color, typography, and alignment supports configured in `theme.json`.
 - **Use the Interactivity API for frontend JS:** For interactive UI (tabs, accordions, modals, filters), use `@wordpress/interactivity` (`data-wp-interactive`, `data-wp-on--click`, `data-wp-bind--*`) with `viewScriptModule` in `block.json`. Avoid jQuery or manual `document.querySelectorAll` DOM scraping.
 
 ---
@@ -66,7 +68,9 @@ Before building a custom block, check whether the requirement can be solved with
 
 ### Security Basics (Required)
 - **Escape on output:** Escape all dynamic data in `render.php` and `patterns/` using `esc_html()`, `esc_attr()`, `esc_url()`, or `wp_kses_post()`.
-- **Sanitize on input:** Sanitize `$_GET`, `$_POST`, and `$_REQUEST` data with `sanitize_text_field()`, `absint()`, `sanitize_email()`, etc. - **Nonces & Capabilities:** Verify nonces (`wp_verify_nonce()` / `check_ajax_referer()`) and capabilities (`current_user_can()`) on any form submission, REST route, or AJAX handler. - **Database queries:** Use `$wpdb->prepare()` for any custom SQL queries.
+- **Sanitize on input:** Sanitize `$_GET`, `$_POST`, and `$_REQUEST` data with `sanitize_text_field()`, `absint()`, `sanitize_email()`, etc.
+- **Nonces & Capabilities:** Verify nonces (`wp_verify_nonce()` / `check_ajax_referer()`) and capabilities (`current_user_can()`) on any form submission, REST route, or AJAX handler.
+- **Database queries:** Use `$wpdb->prepare()` for any custom SQL queries.
 
 ### CSS & JavaScript
 - Scope custom block styles to the block's generated `.wp-block-<namespace>-<block-name>` class.
@@ -77,5 +81,5 @@ Before building a custom block, check whether the requirement can be solved with
 
 ## Git & Workflow
 - Do not commit `node_modules/`, editor folders (`.idea/`, `.vscode/`), or `.DS_Store`.
+- Confirm all styling, layout, and block setting updates are committed in `theme.json` and theme files rather than dependent on database-saved `wp_block` or Site Editor entries.
 - Before finishing any task that modifies blocks, SCSS, or JS, verify that `npm run build` completes cleanly with zero Webpack errors.
-

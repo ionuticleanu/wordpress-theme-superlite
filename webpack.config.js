@@ -1,5 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const { generateThemeCss, THEME_JSON_PATH } = require('./scripts/generate-theme-css');
+
+// Generate src/scss/_global-styles.scss from theme.json before compiling SCSS
+generateThemeCss();
 
 // Ensure @wordpress/scripts outputs both standard scripts and ES modules (Interactivity API)
 process.env.WP_EXPERIMENTAL_MODULES = process.env.WP_EXPERIMENTAL_MODULES || 'true';
@@ -42,10 +46,15 @@ scriptConfig.entry = async () => {
 };
 
 // Strip empty .js stubs emitted by Webpack for standalone CSS entry points
+// and keep src/scss/_global-styles.scss synced when theme.json changes in watch mode
 scriptConfig.plugins.push({
 	apply(compiler) {
 		const { Compilation } = compiler.webpack;
+		compiler.hooks.watchRun.tap('SyncThemeJsonCss', () => {
+			generateThemeCss();
+		});
 		compiler.hooks.thisCompilation.tap('RemoveEmptyCssJs', (compilation) => {
+			compilation.fileDependencies.add(THEME_JSON_PATH);
 			compilation.hooks.processAssets.tap(
 				{
 					name: 'RemoveEmptyCssJs',
