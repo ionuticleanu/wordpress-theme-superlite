@@ -280,7 +280,7 @@ function generateThemeCss() {
 		delete bodyStyle.spacing.padding;
 	}
 	const bodyDecls = ['margin: 0;', ...styleObjectToDeclarations(bodyStyle)];
-	sections.push(formatRule('body', bodyDecls));
+	sections.push(formatRule(':where(body)', bodyDecls));
 
 	// Root padding & layout rules
 	if (useRootPadding) {

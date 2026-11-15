@@ -14,39 +14,44 @@
 			"defaultDuotone": false,
 			"palette": [
 				{
-					"name": "Base",
+					"name": "Base (Midnight Slate)",
 					"slug": "base",
-					"color": "#ffffff"
+					"color": "#0b0f19"
 				},
 				{
-					"name": "Contrast",
+					"name": "Contrast (Crisp Alabaster)",
 					"slug": "contrast",
-					"color": "#111827"
+					"color": "#f1f5f9"
 				},
 				{
-					"name": "Primary",
+					"name": "Primary (Electric Indigo)",
 					"slug": "primary",
-					"color": "#2563eb"
+					"color": "#6366f1"
 				},
 				{
-					"name": "Secondary",
+					"name": "Secondary (Luminous Violet)",
 					"slug": "secondary",
-					"color": "#0f172a"
+					"color": "#818cf8"
 				},
 				{
-					"name": "Accent",
+					"name": "Accent (Luminous Cyan)",
 					"slug": "accent",
-					"color": "#f59e0b"
+					"color": "#06b6d4"
 				},
 				{
-					"name": "Muted Surface",
+					"name": "Tertiary (Vibrant Rose)",
+					"slug": "tertiary",
+					"color": "#ec4899"
+				},
+				{
+					"name": "Muted Surface (Midnight Glass)",
 					"slug": "muted",
-					"color": "#f3f4f6"
+					"color": "#131c31"
 				},
 				{
-					"name": "Border",
+					"name": "Border (Slate Hairline)",
 					"slug": "border",
-					"color": "#e5e7eb"
+					"color": "#24324f"
 				}
 			]
 		},
@@ -196,22 +201,26 @@
 			"button": {
 				"color": {
 					"background": "var(--wp--preset--color--primary)",
-					"text": "var(--wp--preset--color--base)"
+					"text": "#ffffff"
 				},
 				"border": {
-					"radius": "0.375rem"
+					"radius": "9999px"
+				},
+				"typography": {
+					"fontWeight": "600"
 				},
 				"spacing": {
 					"padding": {
-						"top": "0.75rem",
-						"bottom": "0.75rem",
-						"left": "1.5rem",
-						"right": "1.5rem"
+						"top": "0.8rem",
+						"bottom": "0.8rem",
+						"left": "1.75rem",
+						"right": "1.75rem"
 					}
 				},
 				":hover": {
 					"color": {
-						"background": "var(--wp--preset--color--secondary)"
+						"background": "var(--wp--preset--color--secondary)",
+						"text": "#ffffff"
 					}
 				}
 			},

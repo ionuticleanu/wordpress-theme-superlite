@@ -37,10 +37,6 @@ function superlite_cleanup_head() {
 
 	if (!is_admin()) {
 		remove_action('enqueue_block_assets', 'wp_enqueue_classic_theme_styles');
-		remove_action('wp_enqueue_scripts', 'wp_enqueue_global_styles');
-		remove_action('wp_footer', 'wp_enqueue_global_styles', 1);
-		remove_action('wp_enqueue_scripts', 'wp_enqueue_stored_styles');
-		remove_action('wp_footer', 'wp_enqueue_stored_styles', 1);
 		remove_action('wp_head', 'wp_enqueue_img_auto_sizes_contain_css_fix', 0);
 		remove_action('wp_head', 'wp_print_auto_sizes_contain_css_fix');
 	}

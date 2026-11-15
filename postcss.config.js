@@ -20,6 +20,7 @@ module.exports = {
 						],
 						defaultExtractor: (content) =>
 							content.match(/[\w-/:]+(?<!:)/g) || [],
+						keyframes: true,
 						safelist: {
 							standard: [
 								'html',
@@ -96,6 +97,12 @@ module.exports = {
 								/^wp-block-media-text/,
 								/^site-header/,
 								/^site-footer/,
+								/^animate__animated$/,
+								/^animate__fadeIn/,
+								/^animate__zoomIn/,
+								/^animate__fast/,
+								/^animate__slow/,
+								/^animate__delay-/,
 							],
 						},
 					}),

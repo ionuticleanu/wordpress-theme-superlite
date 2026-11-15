@@ -4,8 +4,14 @@ require_once get_template_directory() . '/inc/cleanup.php';
 require_once get_template_directory() . '/inc/navigation.php';
 require_once get_template_directory() . '/inc/pages.php';
 
-// Auto-register all compiled blocks in dist/blocks/
+// Auto-register all compiled blocks in dist/blocks/ and register pattern categories
 add_action('init', function () {
+	if (function_exists('register_block_pattern_category')) {
+		register_block_pattern_category('superlite-sections', [
+			'label' => __('SuperLite Sections', 'superlite'),
+		]);
+	}
+
 	$blocks_dir = get_template_directory() . '/dist/blocks';
 	if (!is_dir($blocks_dir)) {
 		return;
@@ -16,7 +22,8 @@ add_action('init', function () {
 	}
 });
 
-// Enqueue global theme CSS & JS
+// Enqueue global theme CSS & JS before `wp_enqueue_global_styles` (priority 10)
+// so WordPress Style Editor customizations always take precedence.
 add_action('wp_enqueue_scripts', function () {
 	$theme_dir = get_template_directory();
 	$theme_uri = get_template_directory_uri();
@@ -46,4 +53,4 @@ add_action('wp_enqueue_scripts', function () {
 			true
 		);
 	}
-});
+}, 5);
