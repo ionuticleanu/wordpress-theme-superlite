@@ -41,12 +41,6 @@ function superlite_resolve_navigation_slug($parsed_block) {
 		return $parsed_block;
 	}
 
-	$nav_post = get_page_by_path($slug, OBJECT, 'wp_navigation');
-	if ($nav_post instanceof WP_Post) {
-		$parsed_block['attrs']['ref'] = $nav_post->ID;
-		return $parsed_block;
-	}
-
 	$menu_file = get_template_directory() . '/menus/' . $slug . '.html';
 	if (is_readable($menu_file)) {
 		$contents = file_get_contents($menu_file);
@@ -55,8 +49,14 @@ function superlite_resolve_navigation_slug($parsed_block) {
 			if (!empty($parsed[0]['innerBlocks'])) {
 				$parsed_block['innerBlocks']  = superlite_resolve_menu_urls($parsed[0]['innerBlocks']);
 				$parsed_block['innerContent'] = $parsed[0]['innerContent'];
+				return $parsed_block;
 			}
 		}
+	}
+
+	$nav_post = get_page_by_path($slug, OBJECT, 'wp_navigation');
+	if ($nav_post instanceof WP_Post) {
+		$parsed_block['attrs']['ref'] = $nav_post->ID;
 	}
 
 	return $parsed_block;

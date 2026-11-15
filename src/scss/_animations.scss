@@ -160,7 +160,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	:where(.site-header) {
+	:where(.site-header__brand) {
 		animation: fadeIn var(--animate-duration) ease-out both;
 	}
 

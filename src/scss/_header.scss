@@ -3,16 +3,25 @@
 	position: sticky;
 	top: 0;
 	z-index: 40;
+	border-bottom: 1px solid color-mix(in srgb, var(--wp--preset--color--primary) 26%, transparent);
+	box-shadow: 0 10px 30px -15px rgb(0 0 0 / 0.45);
+	padding-block: var(--wp--preset--spacing--sm);
+}
+
+/* Keep backdrop-filter on ::after so <header> never traps position:fixed mobile nav overlays */
+:where(header.wp-block-template-part, .wp-block-template-part:has(> .site-header))::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
 	backdrop-filter: blur(18px) saturate(160%);
 	-webkit-backdrop-filter: blur(18px) saturate(160%);
 	background: linear-gradient(
 		180deg,
-		color-mix(in srgb, var(--wp--preset--color--base) 82%, transparent) 0%,
-		color-mix(in srgb, var(--wp--preset--color--muted) 72%, transparent) 100%
+		color-mix(in srgb, var(--wp--preset--color--base) 85%, transparent) 0%,
+		color-mix(in srgb, var(--wp--preset--color--muted) 78%, transparent) 100%
 	);
-	border-bottom: 1px solid color-mix(in srgb, var(--wp--preset--color--primary) 26%, transparent);
-	box-shadow: 0 10px 30px -15px rgb(0 0 0 / 0.45);
-	padding-block: var(--wp--preset--spacing--sm);
 }
 
 :where(header.wp-block-template-part, .wp-block-template-part:has(> .site-header))::before {
@@ -166,6 +175,66 @@
 	color: var(--wp--preset--color--contrast);
 	transform: translateY(-2px);
 	box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--wp--preset--color--primary) 45%, transparent);
+}
+
+/* Mobile Responsive Menu Toggle & Full-Screen Overlay Styling */
+:where(.site-header .wp-block-navigation__responsive-container-open),
+:where(.site-header .wp-block-navigation__responsive-container-close) {
+	padding: 0.5rem;
+	border-radius: 9999px;
+	color: var(--wp--preset--color--contrast);
+	background-color: color-mix(in srgb, var(--wp--preset--color--primary) 18%, transparent);
+	border: 1px solid color-mix(in srgb, var(--wp--preset--color--accent) 35%, transparent);
+}
+
+.site-header .wp-block-navigation__responsive-container.is-menu-open {
+	position: fixed !important;
+	inset: 0 !important;
+	width: 100vw !important;
+	min-height: 100dvh !important;
+	z-index: 100000 !important;
+	background:
+		radial-gradient(
+			420px circle at 85% 15%,
+			color-mix(in srgb, var(--wp--preset--color--primary) 26%, transparent),
+			transparent 70%
+		),
+		radial-gradient(
+			380px circle at 15% 85%,
+			color-mix(in srgb, var(--wp--preset--color--tertiary) 22%, transparent),
+			transparent 70%
+		),
+		var(--wp--preset--color--base) !important;
+	color: var(--wp--preset--color--contrast) !important;
+	padding: var(--wp--preset--spacing--md) !important;
+}
+
+.site-header .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-content {
+	align-items: stretch !important;
+	padding-top: 3.5rem !important;
+	gap: 0.75rem !important;
+}
+
+.site-header .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__container {
+	width: 100% !important;
+	align-items: stretch !important;
+	gap: 0.75rem !important;
+}
+
+.site-header .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation-item {
+	width: 100% !important;
+}
+
+.site-header .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation-item__content {
+	display: flex !important;
+	width: 100% !important;
+	padding: 0.85rem 1.25rem !important;
+	font-size: var(--wp--preset--font-size--lg) !important;
+	font-weight: 700 !important;
+	border-radius: 1rem !important;
+	background-color: color-mix(in srgb, var(--wp--preset--color--muted) 85%, transparent) !important;
+	border: 1px solid color-mix(in srgb, var(--wp--preset--color--primary) 28%, transparent) !important;
+	color: var(--wp--preset--color--contrast) !important;
 }
 
 :where(.site-header .wp-block-site-tagline) {

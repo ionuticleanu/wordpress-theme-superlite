@@ -127,6 +127,8 @@ function superlite_populate_virtual_page_query($wp_query, $page_data) {
 	$wp_query->max_num_pages     = 1;
 	$wp_query->is_404            = false;
 	$wp_query->is_page           = true;
+	$wp_query->is_single         = false;
+	$wp_query->is_attachment     = false;
 	$wp_query->is_singular       = true;
 	$wp_query->is_home           = false;
 	$wp_query->is_archive        = false;
