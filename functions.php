@@ -4,6 +4,20 @@ require_once get_template_directory() . '/inc/cleanup.php';
 require_once get_template_directory() . '/inc/navigation.php';
 require_once get_template_directory() . '/inc/pages.php';
 
+// Automatically invalidate WordPress's cached theme.json styles whenever theme.json is edited on disk
+add_action('after_setup_theme', function () {
+	$theme_json = get_template_directory() . '/theme.json';
+	if (!file_exists($theme_json) || !function_exists('wp_clean_theme_json_cache')) {
+		return;
+	}
+
+	$mtime = (int) filemtime($theme_json);
+	if ((int) get_theme_mod('superlite_theme_json_mtime', 0) !== $mtime) {
+		wp_clean_theme_json_cache();
+		set_theme_mod('superlite_theme_json_mtime', $mtime);
+	}
+});
+
 // Auto-register all compiled blocks in dist/blocks/ and register pattern categories
 add_action('init', function () {
 	if (function_exists('register_block_pattern_category')) {

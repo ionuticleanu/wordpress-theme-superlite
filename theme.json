@@ -6,7 +6,7 @@
 		"useRootPaddingAwareAlignments": true,
 		"layout": {
 			"contentSize": "960px",
-			"wideSize": "90%"
+			"wideSize": "100%"
 		},
 		"color": {
 			"defaultPalette": false,
@@ -60,9 +60,20 @@
 			"defaultFontSizes": false,
 			"fontFamilies": [
 				{
-					"name": "System Sans",
+					"name": "Metrophobic",
 					"slug": "sans",
-					"fontFamily": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+					"fontFamily": "\"Metrophobic\", system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+					"fontFace": [
+						{
+							"fontFamily": "Metrophobic",
+							"fontStyle": "normal",
+							"fontWeight": "400",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/Metrophobic-Regular.ttf"
+							]
+						}
+					]
 				},
 				{
 					"name": "Monospace",

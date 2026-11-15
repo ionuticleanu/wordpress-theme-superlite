@@ -75,8 +75,8 @@ body.admin-bar .wp-site-blocks {
 	gap: var(--wp--preset--spacing--md);
 }
 
-:where(.site-footer__brand) {
-	gap: 0.45rem;
+.site-footer__brand {
+	gap: 0.15rem;
 }
 
 :where(.site-footer__badge) {
@@ -84,7 +84,7 @@ body.admin-bar .wp-site-blocks {
 	align-items: center;
 	gap: 0.5rem;
 	width: fit-content;
-	margin: 0 0 0.25rem !important;
+	margin: 0 0 0.45rem !important;
 	padding: 0.28rem 0.85rem;
 	font-size: 0.72rem;
 	font-weight: 700;
@@ -207,12 +207,45 @@ body.admin-bar .wp-site-blocks {
 	box-shadow: 0 4px 14px -2px color-mix(in srgb, var(--wp--preset--color--tertiary) 50%, transparent);
 }
 
-:where(.site-footer .wp-block-site-tagline),
 :where(.site-footer .wp-block-navigation) {
 	font-size: var(--wp--preset--font-size--sm);
 }
 
 :where(.site-footer .wp-block-site-tagline) {
-	opacity: 0.75;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	margin: 0;
+	padding-left: 0.05rem;
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	line-height: 1.1;
+	background: linear-gradient(
+		90deg,
+		var(--wp--preset--color--accent) 0%,
+		var(--wp--preset--color--secondary) 60%,
+		var(--wp--preset--color--tertiary) 100%
+	);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	opacity: 0.92;
+}
+
+:where(.site-footer .wp-block-site-tagline)::before {
+	content: "";
+	display: inline-block;
+	width: 0.95rem;
+	height: 2px;
+	border-radius: 9999px;
+	background: linear-gradient(
+		90deg,
+		var(--wp--preset--color--accent),
+		var(--wp--preset--color--tertiary)
+	);
+	box-shadow: 0 0 8px color-mix(in srgb, var(--wp--preset--color--accent) 60%, transparent);
+	flex-shrink: 0;
 }
 /*! purgecss end ignore */
